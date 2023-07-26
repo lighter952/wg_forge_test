@@ -1,9 +1,10 @@
 import psycopg2
 from statistics import mean, median, mode
-from models import Cat
+from app.models import Cat
 
-conn = psycopg2.connect(host='localhost', port='5432', password='42a', dbname='wg_forge_db', user='wg_forge', )
+conn = psycopg2.connect(host='db', port='5432', password='42a', dbname='wg_forge_db', user='wg_forge', )
 cur = conn.cursor()
+
 
 
 def get_cats_from_db(attribute: str, order: str, offset: int, limit: int) -> list[dict]:

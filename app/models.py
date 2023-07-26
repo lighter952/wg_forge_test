@@ -1,5 +1,4 @@
-from pydantic_core.core_schema import FieldValidationInfo
-from pydantic import BaseModel, ValidationError, field_validator
+from pydantic import BaseModel, field_validator
 
 
 class Cat(BaseModel):

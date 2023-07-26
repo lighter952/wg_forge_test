@@ -1,11 +1,10 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse, JSONResponse
 
-from models import Cat
-from database_func.app import get_cats_from_db, append_new_cat_to_db, is_offset_in_range
+from app.models import Cat
+from app.database_func import get_cats_from_db, append_new_cat_to_db, is_offset_in_range
 
 app = FastAPI(title="My cats!")
-
 
 
 @app.get("/")
