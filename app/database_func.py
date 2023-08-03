@@ -1,8 +1,8 @@
 import psycopg2
 from statistics import mean, median, mode
-from app.models import Cat
+from app.schemas.cats import Cat
 
-conn = psycopg2.connect(host='db', port='5432', password='42a', dbname='wg_forge_db', user='wg_forge', )
+conn = psycopg2.connect(host='0.0.0.0', port='5432', password='42a', dbname='wg_forge_db', user='wg_forge', ) #host='db' for docker usage
 cur = conn.cursor()
 
 
