@@ -6,6 +6,26 @@ conn = psycopg2.connect(host='0.0.0.0', port='5432', password='42a', dbname='wg_
 cur = conn.cursor()
 
 
+def get_user_hash(user_id: int) -> str:
+    cur.execute("SELECT * FROM user_passwords WHERE user_id = \'{}\'".format(user_id))
+    user_hash = cur.fetchone()
+    return user_hash[2]
+
+
+def get_user_from_bd(username: str) -> dict:
+    try:
+        cur.execute("SELECT * FROM users WHERE username = \'{}\'".format(username))
+        user_from_bd = cur.fetchone()
+        return {
+            "user_id": "{}".format(user_from_bd[0]),
+            "username": "{}".format(user_from_bd[1]),
+            "full_name": "{}".format(user_from_bd[2]),
+            "email": "{}".format(user_from_bd[3]),
+            "disabled": user_from_bd[4]
+        }
+    except IOError:
+        print("Get user from database error!")
+
 
 def get_cats_from_db(attribute: str, order: str, offset: int, limit: int) -> list[dict]:
     try:
@@ -18,7 +38,7 @@ def get_cats_from_db(attribute: str, order: str, offset: int, limit: int) -> lis
             json_res.append(record)
         return json_res
     except IOError:
-        print("Get cats from database error!, ")
+        print("Get cats from database error!")
 
 
 def append_new_cat_to_db(cat: Cat):
