@@ -1,6 +1,11 @@
+from types import NoneType
+
 import psycopg2
 from statistics import mean, median, mode
+from fastapi import HTTPException
+
 from app.schemas.cats import Cat
+from app.schemas.users import User, UserInDB
 
 conn = psycopg2.connect(host='0.0.0.0', port='5432', password='42a', dbname='wg_forge_db', user='wg_forge', ) #host='db' for docker usage
 cur = conn.cursor()
@@ -9,13 +14,23 @@ cur = conn.cursor()
 def get_user_hash(user_id: int) -> str:
     cur.execute("SELECT * FROM user_passwords WHERE user_id = \'{}\'".format(user_id))
     user_hash = cur.fetchone()
+    if type(user_hash) is NoneType:
+        return 0
     return user_hash[2]
+
+
+def update_password_hash(user_id: int, new_hash: str) -> int:
+    cur.execute("UPDATE user_passwords SET password_hash = \'{}\' WHERE user_id = {}".format(new_hash, user_id))
+    conn.commit()
+    return 200
 
 
 def get_user_from_bd(username: str) -> dict:
     try:
         cur.execute("SELECT * FROM users WHERE username = \'{}\'".format(username))
         user_from_bd = cur.fetchone()
+        if type(user_from_bd) is NoneType:
+            raise HTTPException(status_code=401, detail="Incorrect username or password")
         return {
             "user_id": "{}".format(user_from_bd[0]),
             "username": "{}".format(user_from_bd[1]),
@@ -31,7 +46,7 @@ def get_cats_from_db(attribute: str, order: str, offset: int, limit: int) -> lis
     try:
         cur.execute("SELECT * FROM cats ORDER BY {} {} OFFSET {} LIMIT {}".format(attribute, order, offset, limit))
         res = cur.fetchall()
-        print(res)
+
         json_res = []
         for cat in res:
             record = {"name": cat[0], "color": cat[1], "tail_length": cat[2], "whiskers_length": cat[3]}
@@ -88,4 +103,3 @@ def update_cats_stat() -> None:
 def update_cats_color_counts() -> None:
     cur.execute("insert into cat_colors_info (color, count) select color, count(*) as count from cats group by color;")
     conn.commit()
-
