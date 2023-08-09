@@ -1,11 +1,10 @@
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException
 from fastapi.responses import JSONResponse
-from app.utils.dependencies import oauth2_scheme, get_current_user
-from app.schemas.users import User, UserInDB
+from app.utils.dependencies import get_current_user
+from app.schemas.users import User
 from app.schemas.cats import Cat
-from app.database_func import get_cats_from_db, append_new_cat_to_db, is_offset_in_range, get_user_from_bd, get_user_hash
-
+from app.models.database_func import get_cats_from_db, append_new_cat_to_db, is_offset_in_range, get_user_from_bd
 
 router = APIRouter()
 

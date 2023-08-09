@@ -1,14 +1,21 @@
 version: '3'
 services:
   app:
-    build: .
+    image: nholias/wgtest-app
+#    build: .
     ports:
-      - 8000:8000
+      - "8000:8000"
     depends_on:
       - db
+    environment:
+      DB_HOST: db
+      DB_POST: 5432
+      DB_NAME: wg_forge_db
+      DB_USER: wg_forge
+      DB_PASS: 42aпше
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000
 
   db:
     image: yzh44yzh/wg_forge_backend_env:1.1
     ports:
-      - 5432:5432
+      - "5432:5432"

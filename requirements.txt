@@ -5,4 +5,4 @@ pydantic-core==2.4.0
 psycopg2-binary==2.9.7
 sqlalchemy==2.0.19
 passlib~=1.7.4
-prometheus_client==0.17.1
+python-multipart==0.0.6

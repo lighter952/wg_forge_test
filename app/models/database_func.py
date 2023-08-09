@@ -1,21 +1,32 @@
 from types import NoneType
-
+import os
 import psycopg2
 from statistics import mean, median, mode
 from fastapi import HTTPException
-
 from app.schemas.cats import Cat
-from app.schemas.users import User, UserInDB
 
-conn = psycopg2.connect(host='0.0.0.0', port='5432', password='42a', dbname='wg_forge_db', user='wg_forge', ) #host='db' for docker usage
+
+db_host = os.getenv("DB_HOST")
+db_port = os.getenv("DB_POST")
+db_name = os.getenv("DB_NAME")
+db_user = os.getenv("DB_USER")
+db_pass = os.getenv("DB_PASS")
+
+conn = psycopg2.connect(
+    host=db_host,
+    port=db_port,
+    password=db_pass,
+    dbname=db_name,
+    user=db_user
+)
 cur = conn.cursor()
 
 
 def get_user_hash(user_id: int) -> str:
-    cur.execute("SELECT * FROM user_passwords WHERE user_id = \'{}\'".format(user_id))
+    cur.execute(f'SELECT * FROM user_passwords WHERE user_id = \'{user_id}\'')
     user_hash = cur.fetchone()
     if type(user_hash) is NoneType:
-        return 0
+        return '0'
     return user_hash[2]
 
 
@@ -59,7 +70,8 @@ def get_cats_from_db(attribute: str, order: str, offset: int, limit: int) -> lis
 def append_new_cat_to_db(cat: Cat):
     print(cat)
     try:
-        cur.execute("insert into cats (name, color, tail_length, whiskers_length) values (\'{}\',\'{}\',{},{})".format(str(cat.name), str(cat.color).lower(), int(cat.tail_length), int(cat.whiskers_length)))
+        cur.execute("insert into cats (name, color, tail_length, whiskers_length) values (\'{}\',\'{}\',{},{})".format(
+            str(cat.name), str(cat.color).lower(), int(cat.tail_length), int(cat.whiskers_length)))
         conn.commit()
     except IOError:
         print('New cat creation error!')
@@ -96,7 +108,8 @@ def update_cats_stat() -> None:
     whiskers_length_median: float = median(whiskers_length)
     whiskers_length_mode: int = mode(whiskers_length)
 
-    cur.execute(f"insert into cats_stat values ({tail_length_mean},{tail_length_median},array[{tail_length_mode}],{whiskers_length_mean},{whiskers_length_median},array[{whiskers_length_mode}]);")
+    cur.execute(
+        f"insert into cats_stat values ({tail_length_mean},{tail_length_median},array[{tail_length_mode}],{whiskers_length_mean},{whiskers_length_median},array[{whiskers_length_mode}]);")
     conn.commit()
 
 

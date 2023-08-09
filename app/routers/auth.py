@@ -1,6 +1,5 @@
-import time
-from app.schemas.users import User, UserInDB, PasswordChange
-from app.database_func import get_user_from_bd, get_user_hash, update_password_hash
+from app.schemas.users import User, PasswordChange
+from app.models.database_func import get_user_from_bd, get_user_hash, update_password_hash
 from app.utils.dependencies import get_current_user
 from fastapi import APIRouter
 from fastapi.responses import RedirectResponse
@@ -36,7 +35,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
     if not myctx.verify(form_data.password, get_user_hash(user.get('user_id'))):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
-    return {"access_token": user.get('username') + '1', "token_type": "bearer"}
+    return {"access_token": user.get('username'), "token_type": "bearer"}
 
 
 @router.get("/users/me", tags=["Login"])
@@ -51,7 +50,6 @@ def change_password(form_data: PasswordChange):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
     if not myctx.verify(form_data.old_password, get_user_hash(user.get('user_id'))):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
-    print(type(form_data.old_password))
     update_password_hash(user.get('user_id'), str(myctx.hash(form_data.new_password)))
     return {"Password for user {} was changed!".format(form_data.username)}
 
