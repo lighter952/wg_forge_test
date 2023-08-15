@@ -17,4 +17,6 @@ class UserPassword(BaseModel):
     user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
     password_hash = Column(VARCHAR(100), nullable=False)
 
-
+# token = Table('token', meta,
+#               Column('id', Integer, primary_key=True, autoincrement=True),
+#               Column('token', String(250), nullable=False))
