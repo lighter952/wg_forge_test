@@ -6,11 +6,17 @@ from fastapi import HTTPException
 from app.schemas.cats import Cat
 
 
-db_host = os.getenv("DB_HOST")
-db_port = os.getenv("DB_POST")
-db_name = os.getenv("DB_NAME")
-db_user = os.getenv("DB_USER")
-db_pass = os.getenv("DB_PASS")
+# db_host = os.getenv("DB_HOST")
+# db_port = os.getenv("DB_POST")
+# db_name = os.getenv("DB_NAME")
+# db_user = os.getenv("DB_USER")
+# db_pass = os.getenv("DB_PASS")
+
+db_host = '0.0.0.0'
+db_port = 5432
+db_name = 'wg_forge_db'
+db_user = 'wg_forge'
+db_pass = '42a'
 
 conn = psycopg2.connect(
     host=db_host,
@@ -80,7 +86,7 @@ def append_new_cat_to_db(cat: Cat):
 
 def is_offset_in_range(offset: int) -> True | False:
     """
-    Check is offset greater then 0 and less than table size.
+    Check is offset greater than 0 and less than table size.
     """
     try:
         cur.execute("select count(*) from cats")
@@ -88,7 +94,7 @@ def is_offset_in_range(offset: int) -> True | False:
         if offset >= table_size or offset < 0:
             return False
         return True
-    except IOError as e:
+    except IOError:
         print("Check is offset in range error!")
 
 
@@ -109,7 +115,8 @@ def update_cats_stat() -> None:
     whiskers_length_mode: int = mode(whiskers_length)
 
     cur.execute(
-        f"insert into cats_stat values ({tail_length_mean},{tail_length_median},array[{tail_length_mode}],{whiskers_length_mean},{whiskers_length_median},array[{whiskers_length_mode}]);")
+        f"insert into cats_stat values ({tail_length_mean},{tail_length_median},array[{tail_length_mode}],\
+        {whiskers_length_mean},{whiskers_length_median},array[{whiskers_length_mode}]);")
     conn.commit()
 
 
